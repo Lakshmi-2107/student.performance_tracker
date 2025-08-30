@@ -1,30 +1,22 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm">
     <h1 class="text-3xl font-bold text-slate-800 mb-6">Add a New Student</h1>
     <form method="post" class="space-y-6">
         <div>
             <label for="name" class="block text-sm font-medium text-slate-700">Full Name</label>
-            <div class="mt-1">
-                <input type="text" name="name" id="name" required class="block w-full border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2">
-            </div>
+            <input type="text" name="name" id="name" required class="mt-1 block w-full border-slate-300 rounded-md shadow-sm p-2">
         </div>
         <div>
             <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
-            <div class="mt-1">
-                <input type="email" name="email" id="email" required class="block w-full border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2">
-            </div>
+            <input type="email" name="email" id="email" required class="mt-1 block w-full border-slate-300 rounded-md shadow-sm p-2">
         </div>
         <div>
             <label for="grade_level" class="block text-sm font-medium text-slate-700">Grade Level</label>
-            <div class="mt-1">
-                <input type="text" name="grade_level" id="grade_level" required placeholder="e.g., 10th Grade, Senior" class="block w-full border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2">
-            </div>
+            <input type="text" name="grade_level" id="grade_level" required class="mt-1 block w-full border-slate-300 rounded-md shadow-sm p-2">
         </div>
-        <div class="flex items-center gap-4 pt-4">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold">Save Student</button>
-            <a href="{{ url_for('index') }}" class="text-slate-600 font-semibold hover:text-slate-800">Cancel</a>
+        <div class="pt-4">
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Save Student</button>
         </div>
     </form>
 </div>

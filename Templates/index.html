@@ -1,72 +1,49 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="space-y-8">
-    <!-- Statistics Section -->
     <section>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Stat Card 1 -->
-            {% set icon = 'users' %}
-            {% set label = 'Total Students' %}
-            {% set value = stats.total_students %}
-            {% set color = 'blue' %}
-            {% include 'partials/_stat_card.html' %}
-
-            <!-- Stat Card 2 -->
-            {% set icon = 'book-open' %}
-            {% set label = 'Total Assignments' %}
-            {% set value = stats.total_assignments %}
-            {% set color = 'indigo' %}
-            {% include 'partials/_stat_card.html' %}
-
-            <!-- Stat Card 3 -->
-            {% set icon = 'graduation-cap' %}
-            {% set label = 'Class Average' %}
-            {% set value = '%.1f'|format(stats.class_average) ~ '%' %}
-            {% set color = 'amber' %}
-            {% include 'partials/_stat_card.html' %}
-
-            <!-- Stat Card 4 -->
-            {% set icon = 'medal' %}
-            {% set label = 'A Students (90%+)' %}
-            {% set value = stats.a_students_count %}
-            {% set color = 'green' %}
-            {% include 'partials/_stat_card.html' %}
+            <div class="bg-white p-6 rounded-lg shadow-sm"><p class="text-sm text-slate-500">Total Students</p><p class="text-3xl font-bold">{{ stats.total_students }}</p></div>
+            <div class="bg-white p-6 rounded-lg shadow-sm"><p class="text-sm text-slate-500">Assignments Graded</p><p class="text-3xl font-bold">{{ stats.total_assignments }}</p></div>
+            <div class="bg-white p-6 rounded-lg shadow-sm"><p class="text-sm text-slate-500">Class Average</p><p class="text-3xl font-bold">{{ '%.1f'|format(stats.class_average) }}%</p></div>
+            <div class="bg-white p-6 rounded-lg shadow-sm"><p class="text-sm text-slate-500">"A" Students</p><p class="text-3xl font-bold">{{ stats.a_students_count }}</p></div>
         </div>
     </section>
 
-    <!-- Student List Section -->
     <section class="bg-white p-6 rounded-lg shadow-sm">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <h2 class="text-2xl font-bold text-slate-700">Student Roster</h2>
             <div class="flex items-center gap-4 w-full md:w-auto">
-                <a href="{{ url_for('export_data') }}" class="inline-flex items-center gap-2 text-sm bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-100 font-semibold w-full md:w-auto justify-center">
+                <!-- This is the link that was causing the error -->
+                <a href="{{ url_for('export_data') }}" class="inline-flex items-center gap-2 text-sm bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-100 font-semibold">
                     <i data-lucide="download" class="w-4 h-4"></i>
                     <span>Export Backup</span>
                 </a>
                 <form method="GET" action="{{ url_for('index') }}" class="relative w-full md:w-auto">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
-                    <input type="search" name="search" value="{{ search_query or '' }}" placeholder="Search..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input type="search" name="search" value="{{ search_query or '' }}" placeholder="Search by name or email..." class="w-full pl-4 pr-4 py-2 border rounded-lg">
                 </form>
             </div>
         </div>
-
-        {% if students %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for student_detail in students %}
-                    {# The student_detail variable is automatically available in the included template #}
-                    {% include 'partials/_student_card.html' %}
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-16">
-                <i data-lucide="frown" class="mx-auto text-slate-400 w-16 h-16"></i>
-                <h3 class="mt-4 text-xl font-semibold text-slate-700">No Students Found</h3>
-                <p class="mt-2 text-slate-500">
-                    {% if search_query %} No students match your search. {% else %} Click "Add Student" to get started. {% endif %}
-                </p>
-            </div>
-        {% endif %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for student_detail in students %}
+                <div class="bg-slate-50 border rounded-lg p-5">
+                    <h3 class="text-lg font-bold text-slate-800">{{ student_detail.info.name }}</h3>
+                    <p class="text-sm text-slate-500 truncate">{{ student_detail.info.email }}</p>
+                    <div class="mt-4 flex justify-between text-sm">
+                        <span>Current Average:</span>
+                        <span class="px-2 py-1 rounded-md font-bold {{ get_grade_color_class(student_detail.average) }}">{{ '%.1f'|format(student_detail.average) }}%</span>
+                    </div>
+                    <div class="mt-2 flex justify-between text-sm">
+                        <span>Assignments:</span><span class="font-bold">{{ student_detail.grade_count }}</span>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{{ url_for('student_detail', student_id=student_detail.info.id) }}" class="w-full text-center block bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-100">View Details</a>
+                    </div>
+                </div>
+            {% else %}
+                <p class="col-span-full text-center py-10 text-slate-500">No students found.</p>
+            {% endfor %}
+        </div>
     </section>
 </div>
 {% endblock %}

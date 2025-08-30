@@ -2,18 +2,20 @@
 
 {% block content %}
 <div class="space-y-8">
+    <!-- Page Header -->
     <div class="bg-white p-6 rounded-lg shadow-sm">
         <h1 class="text-3xl font-bold text-slate-800">Class Reports</h1>
-        <p class="mt-1 text-slate-600">Analyze class performance by subject.</p>
+        <p class="mt-1 text-slate-600">Analyze class performance by subject to find the top performer and the class average.</p>
     </div>
 
+    <!-- Subject Selector Form -->
     <div class="bg-white p-6 rounded-lg shadow-sm">
         <form method="POST" action="{{ url_for('reports') }}">
             <label for="subject" class="block text-sm font-medium text-slate-700 mb-2">Select a Subject to Analyze</label>
             <div class="flex items-center gap-4">
                 <select name="subject" id="subject" class="flex-grow block w-full pl-3 pr-10 py-2 text-base border-slate-300 rounded-md">
                     {% if not subjects %}
-                    <option disabled>No subjects with grades found</option>
+                    <option disabled>No subjects with grades have been added yet</option>
                     {% else %}
                         <option value="" disabled {% if not selected_subject %}selected{% endif %}>-- Choose a subject --</option>
                         {% for subject in subjects %}
@@ -26,10 +28,12 @@
         </form>
     </div>
 
+    <!-- Results Display -->
     {% if results %}
     <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-500">
         <h2 class="text-2xl font-bold text-slate-700">Analysis for "{{ selected_subject }}"</h2>
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Class Average Card -->
             <div class="bg-slate-50 p-5 rounded-lg">
                 <div class="flex items-start gap-4">
                     <div class="p-3 rounded-full bg-amber-100 text-amber-600"><i data-lucide="graduation-cap" class="w-6 h-6"></i></div>
@@ -40,6 +44,7 @@
                 </div>
             </div>
 
+            <!-- Subject Topper Card -->
             <div class="bg-slate-50 p-5 rounded-lg">
                 {% if results.topper %}
                 <div class="flex items-start gap-4">
@@ -48,7 +53,7 @@
                         <p class="text-sm font-medium text-slate-500">Subject Topper</p>
                         <p class="text-2xl font-bold text-slate-800">{{ results.topper.name }}</p>
                         <p class="text-md text-slate-600">
-                            Score: <span class="font-semibold">{{ results.topper.score }}/{{ results.topper.max_score }}</span> 
+                            Score: <span class="font-semibold">{{ results.topper.score }}/{{ results.topper.max_score }}</span>
                         </p>
                     </div>
                 </div>
@@ -61,5 +66,6 @@
     {% elif request.method == 'POST' %}
         <p class="text-center text-slate-500 py-8">Please select a subject to see the report.</p>
     {% endif %}
+
 </div>
 {% endblock %}
