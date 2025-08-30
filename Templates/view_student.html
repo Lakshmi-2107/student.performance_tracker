@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="student-details-header">
+        <h1>{{ student['name'] }}</h1>
+        <a href="{{ url_for('edit_student', student_id=student.id) }}" class="btn-edit">Edit Name</a>
+    </div>
+
+    <div class="student-details">
+        <h2>Grades</h2>
+        <ul class="item-list">
+            {% for grade in grades %}
+                <li class="list-item">
+                    <span>{{ grade['subject'] }}</span>
+                    <span class="grade-actions">
+                        <strong>{{ grade['score'] }}</strong>
+                        <form method="POST" action="{{ url_for('delete_grade', grade_id=grade.id) }}" class="delete-form">
+                           <button type="submit" class="btn-danger-small">Delete</button>
+                        </form>
+                    </span>
+                </li>
+            {% else %}
+                 <p class="no-items-message">No grades have been added for this student yet.</p>
+            {% endfor %}
+        </ul>
+        <div class="average-grade">
+            Average Grade: {{ '%.2f'|format(average_grade) }}
+        </div>
+         <a href="{{ url_for('add_grade', student_id=student.id) }}" class="btn" style="margin-top: 2rem;">Add New Grade</a>
+    </div>
+{% endblock %}```
+
+---
+
+### **5. `static/style.css` (Additions for New Elements)**
+
+Add these new styles to the bottom of your existing `style.css` file for the new buttons, forms, and flash messages.
+
+```css
+/* Add these styles to the bottom of your static/style.css file */
+
+/* --- Action Buttons (Edit, Delete) --- */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* space between buttons */
+}
+
+.btn-edit {
+    background-color: #e09f3e;
+    padding: 8px 15px;
+    border-radius: 5px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.btn-edit:hover {
+    background-color: #c48a35;
+    text-decoration: none;
+}
+
+.btn-danger, .btn-danger-small {
+    background-color: #9e2a2b;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+.btn-danger:hover, .btn-danger-small:hover {
+    background-color: #7b2122;
+}
+.btn-danger-small {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+
+/* --- Inline Delete Forms --- */
+.delete-form {
+    display: inline;
+    margin: 0;
+}
+
+/* --- View Student Page --- */
+.student-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.grade-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* --- Flash Messages --- */
+.flash-messages .alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    color: #fff;
+}
+.alert-success {
+    background-color: #0a9396;
+}
+.alert-error {
+    background-color: #9e2a2b;
+}
+
+/* --- Separator --- */
+.separator {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 2rem 0;
+}

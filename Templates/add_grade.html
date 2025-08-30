@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm">
+    <h1 class="text-3xl font-bold text-slate-800">Add Grade for {{ student.name }}</h1>
+    <p class="text-slate-500 mb-6">Enter the details for the new assignment.</p>
+    <form method="post" class="space-y-6">
+        <div>
+            <label for="subject" class="block text-sm font-medium text-slate-700">Subject</label>
+            <input type="text" name="subject" id="subject" required placeholder="e.g., Mathematics" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm p-2">
+        </div>
+        <div>
+            <label for="assignment_name" class="block text-sm font-medium text-slate-700">Assignment Name</label>
+            <input type="text" name="assignment_name" id="assignment_name" required placeholder="e.g., Algebra Test 1" class="mt-1 block w-full border-slate-300 rounded-md shadow-sm p-2">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="score" class="block text-sm font-medium text-slate-700">Score</label>
+                <input type="number" name="score" id="score" required class="mt-1 block w-full border-slate-300 rounded-md shadow-sm p-2">
+            </div>
+            <div>
+                <label for="max_score" class="block text-sm font-medium text-slate-700">Max Score</label>
+                <input type="number" name="max_score" id="max_score" required class="mt-1 block w-full border-slate-300 rounded-md shadow-sm p-2">
+            </div>
+        </div>
+        <div class="flex items-center gap-4 pt-4">
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-semibold">Add Grade</button>
+            <a href="{{ url_for('student_detail', student_id=student.id) }}" class="text-slate-600 font-semibold hover:text-slate-800">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

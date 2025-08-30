@@ -1,0 +1,15 @@
+{% set colors = {
+    'blue': 'bg-blue-500',
+    'indigo': 'bg-indigo-500',
+    'amber': 'bg-amber-500',
+    'green': 'bg-green-500'
+} %}
+<div class="bg-white p-6 rounded-lg shadow-sm flex items-start gap-4">
+    <div class="p-3 rounded-full text-white {{ colors[color] }}">
+        <i data-lucide="{{ icon }}" class="w-6 h-6"></i>
+    </div>
+    <div>
+        <p class="text-sm font-medium text-slate-500">{{ label }}</p>
+        <p class="text-3xl font-bold text-slate-800">{{ value }}</p>
+    </div>
+</div>
