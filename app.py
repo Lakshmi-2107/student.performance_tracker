@@ -8,15 +8,19 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a-default-secret-key-for-local-dev')
 
+# Use persistent storage on Render or local fallback
+DB_PATH = '/data/students.db' if os.path.exists('/data') else 'students.db'
+
 def get_db_connection():
     """Establishes a connection to the database."""
-    conn = sqlite3.connect('students.db')
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 def calculate_average(grades):
     """Calculates the average percentage from a list of grade objects."""
-    if not grades: return 0
+    if not grades:
+        return 0
     total_percentage = sum((g['score'] / g['max_score']) * 100 for g in grades if g['max_score'] > 0)
     return total_percentage / len(grades) if grades else 0
 
@@ -29,6 +33,28 @@ def utility_processor():
         if percentage >= 70: return 'text-amber-600 bg-amber-100'
         return 'text-red-600 bg-red-100'
     return dict(get_grade_color_class=get_grade_color_class)
+
+def ensure_db():
+    """Initialize the database with schema.sql if it doesn't exist or lacks tables."""
+    if not os.path.exists(DB_PATH):
+        print(f"Database not found. Creating at {DB_PATH}...")
+        with sqlite3.connect(DB_PATH) as conn:
+            with open('schema.sql', 'r') as f:
+                conn.executescript(f.read())
+        print("Database initialized successfully.")
+    else:
+        # Check if 'students' table exists; if not, initialize
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='students';")
+            if not cursor.fetchone():
+                print("Table 'students' missing. Initializing database...")
+                with open('schema.sql', 'r') as f:
+                    conn.executescript(f.read())
+                print("Database schema applied successfully.")
+
+# Ensure DB is ready before handling any request
+ensure_db()
 
 @app.route('/')
 def index():
@@ -120,12 +146,9 @@ def delete_grade(grade_id):
     conn.close()
     return redirect(url_for('student_detail', student_id=student_id))
 
-# --- BONUS FEATURE ROUTES ---
-
 @app.route('/reports', methods=['GET', 'POST'])
 def reports():
     conn = get_db_connection()
-    # Get a unique, sorted list of all subjects that have grades
     subjects_data = conn.execute('SELECT DISTINCT subject FROM grades ORDER BY subject').fetchall()
     subjects = [row['subject'] for row in subjects_data]
     
@@ -135,8 +158,6 @@ def reports():
     if request.method == 'POST':
         selected_subject = request.form.get('subject')
         if selected_subject:
-            # --- Subject Topper Calculation ---
-            # Find the student with the highest percentage score in the selected subject
             topper_query = """
                 SELECT s.name, g.score, g.max_score
                 FROM grades g JOIN students s ON g.student_id = s.id
@@ -145,20 +166,9 @@ def reports():
                 LIMIT 1
             """
             topper_data = conn.execute(topper_query, (selected_subject,)).fetchone()
-
-            # --- Class Average by Subject Calculation ---
-            # Get all grades for the subject to calculate the average percentage
-            grades_for_subject = conn.execute(
-                'SELECT score, max_score FROM grades WHERE subject = ?',
-                (selected_subject,)
-            ).fetchall()
-            
+            grades_for_subject = conn.execute('SELECT score, max_score FROM grades WHERE subject = ?', (selected_subject,)).fetchall()
             class_average = calculate_average(grades_for_subject)
-            
-            results = {
-                'topper': topper_data,
-                'class_average': class_average
-            }
+            results = {'topper': topper_data, 'class_average': class_average}
 
     conn.close()
     return render_template('reports.html', subjects=subjects, results=results, selected_subject=selected_subject)
@@ -184,7 +194,4 @@ def export_data():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    if not os.path.exists('students.db'):
-        print("Local database 'students.db' not found.")
-        print("Please run 'python init_db.py' to create the database first.")
-    app.run(debug=True, host='127.0.0.1', port=port)
+    app.run(debug=True, host='0.0.0.0', port=port)
